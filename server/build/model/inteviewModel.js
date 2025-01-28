@@ -43,7 +43,7 @@ const interviewSchema = new mongoose_1.Schema({
     hrId: {
         type: mongoose_1.default.Schema.Types.ObjectId,
         ref: db_1.DB_enum.HR_MODEL,
-        required: true
+        required: false
     }
 });
 exports.interviewModel = mongoose_1.default.model(db_1.DB_enum.INTERVIEW_MODEL, interviewSchema);

@@ -19,4 +19,6 @@ exports.router.route('/signup').post(controller.login.bind(controller));
 exports.router.route('/login').post(controller.login.bind(controller));
 exports.router.route('/timeslots')
     .get(interviewController.listAllInterview.bind(interviewController))
-    .post(interviewController.createInterview.bind(interviewController));
+    .post(interviewController.createInterview.bind(interviewController))
+    .delete(interviewController.delete.bind(interviewController))
+    .put(interviewController.update.bind(interviewController));

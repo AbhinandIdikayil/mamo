@@ -32,5 +32,30 @@ class InterviewService {
             return yield this.repo.create(data);
         });
     }
+    deleteInterview(id) {
+        return __awaiter(this, void 0, void 0, function* () {
+            const result = yield this.repo.deleteOne(id);
+            if (result) {
+                return true;
+            }
+            else {
+                throw ErrorResponse_1.default.badRequest('Cannot find timeslot');
+            }
+        });
+    }
+    updateInterview(data) {
+        return __awaiter(this, void 0, void 0, function* () {
+            const result = yield this.repo.findByid(data.id);
+            if (!result) {
+                throw ErrorResponse_1.default.badRequest('Cannot find timeslot');
+            }
+            result.start = data.start;
+            result.end = data.end;
+            // Save the updated interview to the database
+            yield result.save();
+            // Return the updated interview document
+            return result;
+        });
+    }
 }
 exports.InterviewService = InterviewService;

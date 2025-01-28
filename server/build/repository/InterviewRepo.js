@@ -30,5 +30,16 @@ class InterviewRepo {
             }).exec();
         });
     }
+    deleteOne(id) {
+        return __awaiter(this, void 0, void 0, function* () {
+            const result = yield inteviewModel_1.interviewModel.findByIdAndDelete(id);
+            return result ? true : false;
+        });
+    }
+    findByid(id) {
+        return __awaiter(this, void 0, void 0, function* () {
+            return yield inteviewModel_1.interviewModel.findById(id);
+        });
+    }
 }
 exports.InterviewRepo = InterviewRepo;
