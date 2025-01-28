@@ -5,6 +5,8 @@ import moment from 'moment';
 import 'react-big-calendar/lib/css/react-big-calendar.css';
 import { API } from '../constants/axiosInstance';
 import Modal from './Modal';
+import { toast } from 'sonner';
+import { AxiosError } from 'axios';
 
 const localizer = momentLocalizer(moment);
 
@@ -22,7 +24,7 @@ const MyCalendar = () => {
     const fetchTimeslots = async () => {
         try {
             const { data } = await API.get('/timeslots');
-            const formattedEvents = data.data?.map((slot:any) => ({
+            const formattedEvents = data.data?.map((slot: any) => ({
                 start: new Date(slot.start),
                 end: new Date(slot.end),
                 title: slot.title,
@@ -48,15 +50,24 @@ const MyCalendar = () => {
                 title: newEvent.title,
             });
             const res = data.data;
-            setEvents([...events, {
-                start: new Date(res.start),
-                end: new Date(res.end),
-                title: res.title,
-                id: res._id
-            }]);
-            setShowModal(false); // Close the modal
-            setNewEvent({ title: '', start: null, end: null }); // Reset the new event
+            if (res) {
+                toast.success('Interveiw has scheduled');
+                setEvents([...events, {
+                    start: new Date(res.start),
+                    end: new Date(res.end),
+                    title: res.title,
+                    id: res._id
+                }]);
+                setShowModal(false); // Close the modal
+                setNewEvent({ title: '', start: null, end: null }); // Reset the new event
+            }
         } catch (error) {
+            if (error instanceof AxiosError) {
+                if(error.response?.data.message){
+                    toast.warning(error.response?.data.message)
+                }
+            }
+
             console.error('Error saving event:', error);
         }
     };
@@ -95,9 +106,14 @@ const MyCalendar = () => {
                         id: event.id
                     }
                 });
-                console.log(data);
-                setEvents((prevEvents: any) => prevEvents.filter((evt: any) => evt.id !== event.id));
+                if (data.data) {
+                    toast.success('Interview deleted successfully')
+                    setEvents((prevEvents: any) => prevEvents.filter((evt: any) => evt.id !== event.id));
+                } else {
+                    toast.error('Error while deleting')
+                }
             } catch (error) {
+               
                 console.error('Error deleting event:', error);
             }
         }
@@ -133,7 +149,7 @@ const MyCalendar = () => {
                             Title:
                             <input
                                 type="text"
-                                className='border rounded  w-full'
+                                className='border rounded  w-full px-2'
                                 value={newEvent.title}
                                 onChange={(e) => setNewEvent({ ...newEvent, title: e.target.value })}
                             />
@@ -144,7 +160,7 @@ const MyCalendar = () => {
                             Start
                         </label>
                         <input
-                            className='border rounded'
+                            className='border rounded px-2'
                             type="datetime-local"
                             value={moment(newEvent.start).format('YYYY-MM-DDTHH:mm')}
                             onChange={(e) => {
@@ -159,7 +175,7 @@ const MyCalendar = () => {
                         </label>
                         <input
                             type="datetime-local"
-                            className='border rounded '
+                            className='border rounded px-2'
                             value={moment(newEvent.end).format('YYYY-MM-DDTHH:mm')}
                             onChange={(e) => {
 
@@ -179,13 +195,7 @@ const MyCalendar = () => {
                     >
                         {selectedEvent ? 'Update Event' : 'Save Event'}
                     </button>
-                    {selectedEvent && (
-                        <button onClick={handleDeleteEvent}
-                            className="mr-3 bg-green-500 px-3 py-1 font-bold rounded-md text-white"
-                        >
-                            Delete Event
-                        </button>
-                    )}
+
                     <button
                         className="mr-3 bg-black px-3 py-1 font-bold rounded-md text-white"
                         onClick={() => setShowModal(false)}>Cancel</button>
